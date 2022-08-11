@@ -8,7 +8,7 @@ on:
 jobs:
   default_build:
     runs-on: ubuntu-20.04
-    name: Java Serial sample
+    name: Java Default Actions sample
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v3
@@ -17,9 +17,10 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: 17
+          id: setup_java
       - name: Create Toolchains (Superfluous)
         run: |
-          echo "<toolchains><toolchain><type>jdk</type><provides><version>${JAVA_VERSION}</version><vendor>temurin</vendor></provides><configuration><jdkHome>${JAVA_HOME}</jdkHome></configuration></toolchain></toolchains>" > ~/.m2/toolchains.xml
+          echo "<toolchains><toolchain><type>jdk</type><provides><version>${{steps.setup_java.outputs.version}}</version><vendor>temurin</vendor></provides><configuration><jdkHome>${JAVA_HOME}</jdkHome></configuration></toolchain></toolchains>" > ~/.m2/toolchains.xml
       - name: Show Toolchains (Debug)
         run: |
           cat ~/.m2/toolchains.xml
