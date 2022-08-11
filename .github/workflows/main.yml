@@ -17,7 +17,7 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: 17
-          id: setup_java
+        id: setup_java
       - name: Create Toolchains (Superfluous)
         run: |
           echo "<toolchains><toolchain><type>jdk</type><provides><version>${{steps.setup_java.outputs.version}}</version><vendor>temurin</vendor></provides><configuration><jdkHome>${JAVA_HOME}</jdkHome></configuration></toolchain></toolchains>" > ~/.m2/toolchains.xml
