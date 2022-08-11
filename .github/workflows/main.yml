@@ -25,7 +25,7 @@ jobs:
         run: |
           echo "setup-java output"
           echo "distribution: ${{steps.setup_java.outputs.distribution}}"
-          echo "java-version: ${{steps.setup_java.outputs.java-version}}"
+          echo "java-version: ${{steps.setup_java.outputs.version}}"
           echo "path: ${{steps.setup_java.outputs.path}}"
           echo "Expected data in Toolchains"
           cat ~/.m2/toolchains.xml
