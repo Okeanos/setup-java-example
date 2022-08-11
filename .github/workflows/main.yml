@@ -1,0 +1,144 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  default_build:
+    runs-on: ubuntu-20.04
+    name: Java Serial sample
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+      - name: Setup Java 17
+        uses: actions/setup-java@3
+        with:
+          distribution: 'temurin'
+          java-version: 17
+      - name: Create Toolchains (Superfluous)
+        run: |
+          echo "<toolchains><toolchain><type>jdk</type><provides><version>${JAVA_VERSION}</version><vendor>openjdk</vendor></provides><configuration><jdkHome>${JAVA_HOME}</jdkHome></configuration></toolchain></toolchains>" > ~/.m2/toolchains.xml
+      - name: Build with Maven
+        run: |
+          pushd ./maven/
+          mvn package
+          popd
+      - name: Gradle show detected Toolchains (Debug)
+        run: |
+          pushd ./gradle/
+          gradle -q javaToolchains
+          popd
+      - name: Build with Gradle
+        run: |
+          pushd ./gradle/
+          gradle build
+          gradle --stop
+          popd
+  matrix_build:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        java: [ '8', '11', '17' ]
+    name: Java ${{ matrix.Java }} sample
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+      - name: Setup Java
+        uses: Okeanos/setup-java@maven-toolchains-support
+        with:
+          distribution: 'temurin'
+          java-version: ${{ matrix.java }}
+      - name: Show Toolchains
+        run: |
+          cat ~/.m2/toolchains.xml
+      - name: Build with Maven
+        run: |
+          pushd ./maven/
+          mvn package
+          popd
+      - name: Gradle show detected Toolchains (Debug)
+        if: always()
+        run: |
+          pushd ./gradle/
+          gradle -q javaToolchains
+          popd
+      - name: Build with Gradle
+        if: always()
+        run: |
+          pushd ./gradle/
+          gradle build
+          gradle --stop
+          popd
+  serial_build:
+    runs-on: ubuntu-20.04
+    name: Java Serial sample
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+      - name: Setup Java 8
+        uses: Okeanos/setup-java@maven-toolchains-support
+        with:
+          distribution: 'temurin'
+          java-version: 8
+      - name: Setup Java 11
+        uses: Okeanos/setup-java@maven-toolchains-support
+        with:
+          distribution: 'temurin'
+          java-version: 11
+      - name: Setup Java 17
+        uses: Okeanos/setup-java@maven-toolchains-support
+        with:
+          distribution: 'temurin'
+          java-version: 17
+      - name: Show Toolchains (Debug)
+        run: |
+          cat ~/.m2/toolchains.xml
+      - name: Build with Maven
+        run: |
+          pushd ./maven/
+          mvn package
+          popd
+      - name: Gradle show detected Toolchains (Debug)
+        run: |
+          pushd ./gradle/
+          gradle -q javaToolchains
+          popd
+      - name: Build with Gradle
+        run: |
+          pushd ./gradle/
+          gradle build
+          gradle --stop
+          popd
+      - name: Show Gradle JDKs (Debug)
+        run: |
+          ls -A ~/.gradle/jdks/
+  old_gradle_build:
+    runs-on: ubuntu-20.04
+    name: Java with old Gradle sample
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+      - name: Setup Java 17
+        uses: Okeanos/setup-java@maven-toolchains-support
+        with:
+          distribution: 'temurin'
+          java-version: 17
+      - name: Show Toolchains (Debug)
+        run: |
+          cat ~/.m2/toolchains.xml
+      - name: Gradle show detected Toolchains (Debug)
+        run: |
+          pushd ./gradle-7.3/
+          gradle -q javaToolchains
+          popd
+      - name: Build with Gradle
+        run: |
+          pushd ./gradle-7.3/
+          gradle build
+          gradle --stop
+          popd
+      - name: Show Gradle JDKs (Debug)
+        run: |
+          ls -A ~/.gradle/jdks/
